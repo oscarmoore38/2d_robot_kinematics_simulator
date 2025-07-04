@@ -6,25 +6,13 @@ I've become interested in robotics lately and thought this would be a great intr
 
 **Features**
 
-Forward Kinematics (FK): Calculate the end-effector's position given the joint angles of the 2-DoF planar arm.
+- Forward Kinematics (FK): Calculate the end-effector's position given the joint angles of the 2-DoF planar arm.
 
-Inverse Kinematics (IK): Determine the required joint angles to reach a specified target position for the end-effector.
+- Inverse Kinematics (IK): Determine the required joint angles to reach a specified target position for the end-effector.
 
-2D Visualization: Graphical representation of the robotic arm's configuration and movement within a 2D plane.
+- 2D Visualization: Graphical representation of the robotic arm's configuration and movement within a 2D plane.
 
-User Interaction: Allow dynamic input for joint angles (FK) or target positions (IK) to observe real-time arm responses.
-
-**Technologies Used**
-
-Language: C++
-
-Build System: CMake
-
-Testing Framework: Google Test
-
-Integrated Development Environment (IDE): VS Code (with C++ Extension recommended)
-
-Graphics Library: (To be chosen and implemented by the user, e.g., SFML, Raylib, or a custom plotting solution)
+- User Interaction: Allow dynamic input for joint angles (FK) or target positions (IK) to observe real-time arm responses.
 
 **Setup & Building**
 
