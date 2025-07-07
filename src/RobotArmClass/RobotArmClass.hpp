@@ -1,5 +1,6 @@
 #ifndef ROBOTARM_HPP
 #define ROBOTARM_HPP
+#include "./PointerClass/PointerClass.hpp"
 
 /**
  * @class RobotArm
@@ -10,6 +11,14 @@
 class RobotArm{
 public:
     RobotArm();
+
+    Pointer forwardKinematics(double theta1, double theta2); 
+
+    bool inverseKinematics(const Pointer& targetPosition);
+
+    Pointer getJoint1Position() const; 
+
+    Pointer getEndEffectorPosition() const; 
 
 private:
     double link1Length;
