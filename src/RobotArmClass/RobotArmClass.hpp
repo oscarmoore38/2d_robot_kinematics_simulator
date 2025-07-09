@@ -10,7 +10,7 @@
 
 class RobotArm{
 public:
-    RobotArm();
+    RobotArm(double l1, double l2);
 
     Pointer forwardKinematics(double theta1, double theta2); 
 
@@ -20,7 +20,7 @@ public:
 
     Pointer getEndEffectorPosition() const; 
 
-private:
+private: 
     double link1Length;
     double link2Length; 
     double currentTheta1;
