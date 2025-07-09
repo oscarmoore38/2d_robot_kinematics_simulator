@@ -55,6 +55,8 @@ bool RobotArm:: inverseKinematics(const Pointer& targetPosition){
         currentTheta2 = theta2AngleElbowUp;
     }
 
+    return true; 
+
 };
 
 Pointer RobotArm:: forwardKinematics(double theta1, double theta2){
