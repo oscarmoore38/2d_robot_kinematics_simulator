@@ -1,6 +1,6 @@
 #ifndef ROBOTARM_HPP
 #define ROBOTARM_HPP
-#include "./PointerClass/PointerClass.hpp"
+#include "../PointerClass/PointerClass.hpp"
 
 /**
  * @class RobotArm
