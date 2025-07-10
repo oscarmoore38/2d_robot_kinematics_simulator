@@ -60,8 +60,8 @@ bool RobotArm:: inverseKinematics(const Pointer& targetPosition){
 };
 
 Pointer RobotArm:: forwardKinematics(double theta1, double theta2){
-    double x1 = cos(theta1) + cos(theta1 + theta2);
-    double y1 = sin(theta1) + sin(theta1 + theta2);
+    double x1 = link1Length * cos(theta1) + link2Length * cos(theta1 + theta2);
+    double y1 = link1Length * sin(theta1) + link2Length * sin(theta1 + theta2);
 
     Pointer endEffectPos = Pointer(x1, y1);
 
