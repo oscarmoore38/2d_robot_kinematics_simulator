@@ -21,3 +21,10 @@ double Pointer:: getyCord() const{
     return yCord; 
 }
 
+double Pointer:: setyCord(double yCord){
+    this->yCord = yCord; 
+}
+
+double Pointer:: setxCord(double xCord){
+    this->xCord = xCord; 
+}

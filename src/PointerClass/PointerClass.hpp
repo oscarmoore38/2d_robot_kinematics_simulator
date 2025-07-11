@@ -21,6 +21,9 @@ public:
 
     double getyCord() const; 
 
+    double setyCord(double yCord);
+    
+    double setxCord(double xCord);
     
 };
 
