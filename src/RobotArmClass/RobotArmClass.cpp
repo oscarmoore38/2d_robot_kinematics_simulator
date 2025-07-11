@@ -3,7 +3,7 @@
 #include <iostream>
 #include <cmath>
 #include <algorithm>
-#include "./PointerClass/PointerClass.hpp"
+#include "../PointerClass/PointerClass.hpp"
 
 using namespace std; 
 
@@ -68,7 +68,23 @@ Pointer RobotArm:: forwardKinematics(double theta1, double theta2){
     return endEffectPos; 
 };
 
-Pointer RobotArm:: getEndEffectorPosition() const {};
+void RobotArm:: getEndEffectorPosition() const {};
 
-Pointer RobotArm:: getJoint1Position() const {};
+double RobotArm:: getJoint1Position() const {
+    return currentTheta1;
+};
+
+double RobotArm:: getJoint2Position() const {
+    return currentTheta2;
+};
+
+void RobotArm:: setJoint1Position(double theta1) {
+    this->currentTheta1 = theta1; 
+    return; 
+}
+
+void RobotArm:: setJoint2Position(double theta2) {
+    this->currentTheta2 = theta2; 
+    return; 
+}
 
