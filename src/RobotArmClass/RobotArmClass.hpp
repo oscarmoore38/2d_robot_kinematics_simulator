@@ -16,9 +16,15 @@ public:
 
     bool inverseKinematics(const Pointer& targetPosition);
 
-    Pointer getJoint1Position() const; 
+    double getJoint1Position() const; 
 
-    Pointer getEndEffectorPosition() const; 
+    double getJoint2Position() const; 
+
+    void getEndEffectorPosition() const; // void pending implementation 
+
+    void setJoint1Position(double theta1); 
+
+    void setJoint2Position(double theta2); 
 
 private: 
     double link1Length;
