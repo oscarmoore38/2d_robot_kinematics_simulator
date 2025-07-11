@@ -1,4 +1,4 @@
-#include "src/RobotArmClass/RobotArmClass.hpp"
+#include "../src/RobotArmClass/RobotArmClass.hpp"
 #include <iostream>
 #include <string> 
 
