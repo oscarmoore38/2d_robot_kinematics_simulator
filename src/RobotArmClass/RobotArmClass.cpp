@@ -8,7 +8,7 @@
 using namespace std; 
 
 RobotArm:: RobotArm(double l1, double l2)
-    : link1Length(l1), link2Length(l2){
+    : link1Length(l1), link2Length(l2), currentCoords(Pointer()){
 
 };
 
@@ -54,6 +54,10 @@ bool RobotArm:: inverseKinematics(const Pointer& targetPosition){
         currentTheta1 = theta1AngleElbowUp;
         currentTheta2 = theta2AngleElbowUp;
     }
+
+    // Update end effector pos
+    currentCoords.setxCord(x1);
+    currentCoords.setyCord(y1);
 
     return true; 
 

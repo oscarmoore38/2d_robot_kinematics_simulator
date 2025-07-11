@@ -31,7 +31,7 @@ private:
     double link2Length; 
     double currentTheta1;
     double currentTheta2; 
-    
+    Pointer currentCoords;
 };
 
 #endif 
