@@ -16,7 +16,7 @@ add_subdirectory(googletest)
 file(GLOB Sources
     src/*.cpp  
     src/PointerClass/*.cpp
-    src/RobotArm/*.cpp
+    src/RobotArmClass/*.cpp
     src/SimulatorClass/*.cpp
 )
 
@@ -24,7 +24,7 @@ file(GLOB Sources
 file(GLOB Headers
     src/*.hpp
     src/PointerClass/*.hpp
-    src/RobotArm/*.hpp
+    src/RobotArmClass/*.hpp
     src/SimulatorClass/*.hpp
 )
 
