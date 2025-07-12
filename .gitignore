@@ -5,3 +5,9 @@ googletest/
 build/CMakeFiles
 
 build/.cmake
+
+.devcontainer/
+
+.github/
+
+.vscode/
