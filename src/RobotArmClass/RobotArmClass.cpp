@@ -67,12 +67,16 @@ Pointer RobotArm:: forwardKinematics(double theta1, double theta2){
     double x1 = link1Length * cos(theta1) + link2Length * cos(theta1 + theta2);
     double y1 = link1Length * sin(theta1) + link2Length * sin(theta1 + theta2);
 
-    Pointer endEffectPos = Pointer(x1, y1);
+    currentCoords.setxCord(x1);
+    currentCoords.setyCord(y1);
 
-    return endEffectPos; 
+    return currentCoords; 
+
 };
 
-void RobotArm:: getEndEffectorPosition() const {};
+Pointer RobotArm:: getEndEffectorPosition() const {
+    return currentCoords; 
+};
 
 double RobotArm:: getJoint1Position() const {
     return currentTheta1;
