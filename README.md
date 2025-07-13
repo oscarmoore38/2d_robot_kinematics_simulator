@@ -4,6 +4,9 @@
 
 I've become interested in robotics lately and thought this would be a great introduction project to learn more about the basics. In the future, I'd like to extend this to be able to control an actual robotic arm. For now, though, It implements and visualizes forward and inverse kinematics for a 2-degree-of-freedom (2-DoF) planar robotic arm and allows a user to visualize it in a GUI. If you only wish to run the simulator, you can follow the installation steps, omitting the Google Test setup. However, if you plan to extend or modify the program, then installing Google Test as per the instructions will be necessary for testing setup.
 
+## AI use
+AI is here to stay, it seems, and I think it's important to be transparent about its use in my work. This project, for me, was about exploring robotics and getting to write more lines of my favorite language - C++. I have little-to-no interest in frontend web design, so I used AI (Claude) to generate the web-based GUI files (everything in src/frontend) for this project. This allowed me to concentrate on what I'm genuinely interested in learning: the robotics algorithms, kinematics math, and C++ backend implementation. The frontend serves as a functional interface, but my focus and learning efforts went into the robotics programming side.
+
 ## **Features**
 
 - Forward Kinematics (FK): Calculate the end-effector's position given the joint angles of the 2-DoF planar arm.
