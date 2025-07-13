@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>2DOF Robot Arm</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { display: flex; gap: 20px; }
+        .controls { width: 300px; }
+        .canvas-area { flex: 1; }
+        .control-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; }
+        input[type="range"] { width: 200px; }
+        input[type="number"] { width: 80px; }
+        button { padding: 5px 10px; margin: 2px; }
+        .status { background: #f0f0f0; padding: 10px; margin-top: 10px; }
+        #canvas { border: 1px solid #ccc; }
+        .connection { position: absolute; top: 10px; right: 10px; padding: 5px; background: #ffcccc; }
+        .connection.connected { background: #ccffcc; }
+    </style>
+</head>
+<body>
+    <div class="connection" id="status">Disconnected</div>
+    
+    <div class="container">
+        <div class="controls">
+            <h3>Joint Control</h3>
+            <div class="control-group">
+                <label>Joint 1: <span id="j1val">0</span>°</label>
+                <input type="range" id="j1" min="-180" max="180" value="0">
+            </div>
+            <div class="control-group">
+                <label>Joint 2: <span id="j2val">0</span>°</label>
+                <input type="range" id="j2" min="-180" max="180" value="0">
+            </div>
+            
+            <h3>Target Position</h3>
+            <div class="control-group">
+                X: <input type="number" id="targetX" value="0" step="0.1">
+                Y: <input type="number" id="targetY" value="0" step="0.1">
+                <button onclick="moveToTarget()">Move</button>
+            </div>
+            
+            <h3>Arm Parameters</h3>
+            <div class="control-group">
+                <label>Link 1: <span id="l1val">100</span></label>
+                <input type="range" id="l1" min="50" max="200" value="100">
+            </div>
+            <div class="control-group">
+                <label>Link 2: <span id="l2val">100</span></label>
+                <input type="range" id="l2" min="50" max="200" value="100">
+            </div>
+            
+            <div>
+                <button onclick="setAngles(0,0)">Home</button>
+                <button onclick="setAngles(90,0)">Up</button>
+                <button onclick="setAngles(0,90)">Elbow</button>
+                <button onclick="setAngles(45,45)">Diagonal</button>
+            </div>
+            
+            <div class="status">
+                <div>End X: <span id="endX">0</span></div>
+                <div>End Y: <span id="endY">0</span></div>
+                <div>θ1: <span id="theta1">0</span>°</div>
+                <div>θ2: <span id="theta2">0</span>°</div>
+            </div>
+        </div>
+        
+        <div class="canvas-area">
+            <canvas id="canvas" width="600" height="400"></canvas>
+        </div>
+    </div>
+
+    <script>
+        let canvas = document.getElementById('canvas');
+        let ctx = canvas.getContext('2d');
+        let centerX = canvas.width / 2;
+        let centerY = canvas.height / 2;
+        let ws = null;
+        
+        let armState = {
+            theta1: 0, theta2: 0,
+            link1: 100, link2: 100,
+            endX: 0, endY: 0,
+            joint2X: 0, joint2Y: 0
+        };
+        
+        // Event listeners
+        document.getElementById('j1').oninput = function(e) {
+            let val = parseInt(e.target.value);
+            document.getElementById('j1val').textContent = val;
+            send({type: 'joint_angles', theta1: val, theta2: armState.theta2});
+        };
+        
+        document.getElementById('j2').oninput = function(e) {
+            let val = parseInt(e.target.value);
+            document.getElementById('j2val').textContent = val;
+            send({type: 'joint_angles', theta1: armState.theta1, theta2: val});
+        };
+        
+        document.getElementById('l1').oninput = function(e) {
+            let val = parseInt(e.target.value);
+            document.getElementById('l1val').textContent = val;
+            send({type: 'link_lengths', link1: val, link2: armState.link2});
+        };
+        
+        document.getElementById('l2').oninput = function(e) {
+            let val = parseInt(e.target.value);
+            document.getElementById('l2val').textContent = val;
+            send({type: 'link_lengths', link1: armState.link1, link2: val});
+        };
+        
+        canvas.onclick = function(e) {
+            let rect = canvas.getBoundingClientRect();
+            let x = e.clientX - rect.left - centerX;
+            let y = centerY - (e.clientY - rect.top);
+            document.getElementById('targetX').value = x.toFixed(1);
+            document.getElementById('targetY').value = y.toFixed(1);
+        };
+        
+        function send(data) {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify(data));
+            }
+        }
+        
+        function setAngles(t1, t2) {
+            document.getElementById('j1').value = t1;
+            document.getElementById('j2').value = t2;
+            document.getElementById('j1val').textContent = t1;
+            document.getElementById('j2val').textContent = t2;
+            send({type: 'joint_angles', theta1: t1, theta2: t2});
+        }
+        
+        function moveToTarget() {
+            let x = parseFloat(document.getElementById('targetX').value);
+            let y = parseFloat(document.getElementById('targetY').value);
+            if (!isNaN(x) && !isNaN(y)) {
+                send({type: 'target_position', x: x, y: y});
+            }
+        }
+        
+        function updateStatus(data) {
+            Object.assign(armState, data);
+            document.getElementById('endX').textContent = (armState.endX || 0).toFixed(1);
+            document.getElementById('endY').textContent = (armState.endY || 0).toFixed(1);
+            document.getElementById('theta1').textContent = (armState.theta1 || 0).toFixed(1);
+            document.getElementById('theta2').textContent = (armState.theta2 || 0).toFixed(1);
+        }
+        
+        function initWebSocket() {
+            ws = new WebSocket('ws://localhost:8080');
+            ws.onopen = () => {
+                document.getElementById('status').textContent = 'Connected';
+                document.getElementById('status').classList.add('connected');
+            };
+            ws.onmessage = (e) => updateStatus(JSON.parse(e.data));
+            ws.onclose = () => {
+                document.getElementById('status').textContent = 'Disconnected';
+                document.getElementById('status').classList.remove('connected');
+                setTimeout(initWebSocket, 2000);
+            };
+        }
+        
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Grid
+            ctx.strokeStyle = '#eee';
+            ctx.lineWidth = 1;
+            for (let i = 0; i < canvas.width; i += 50) {
+                ctx.beginPath();
+                ctx.moveTo(i, 0);
+                ctx.lineTo(i, canvas.height);
+                ctx.stroke();
+            }
+            for (let i = 0; i < canvas.height; i += 50) {
+                ctx.beginPath();
+                ctx.moveTo(0, i);
+                ctx.lineTo(canvas.width, i);
+                ctx.stroke();
+            }
+            
+            // Center axes
+            ctx.strokeStyle = '#ccc';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(0, centerY);
+            ctx.lineTo(canvas.width, centerY);
+            ctx.moveTo(centerX, 0);
+            ctx.lineTo(centerX, canvas.height);
+            ctx.stroke();
+            
+            // Workspace circle
+            let maxReach = armState.link1 + armState.link2;
+            ctx.strokeStyle = '#ddd';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, maxReach, 0, 2 * Math.PI);
+            ctx.stroke();
+            
+            // Calculate positions
+            let j1x = centerX;
+            let j1y = centerY;
+            let j2x = centerX + (armState.joint2X || 0);
+            let j2y = centerY - (armState.joint2Y || 0);
+            let ex = centerX + (armState.endX || 0);
+            let ey = centerY - (armState.endY || 0);
+            
+            // Draw links
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(j1x, j1y);
+            ctx.lineTo(j2x, j2y);
+            ctx.lineTo(ex, ey);
+            ctx.stroke();
+            
+            // Draw joints
+            ctx.fillStyle = '#f00';
+            ctx.beginPath();
+            ctx.arc(j1x, j1y, 6, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            ctx.fillStyle = '#0f0';
+            ctx.beginPath();
+            ctx.arc(j2x, j2y, 5, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // End effector
+            ctx.fillStyle = '#00f';
+            ctx.beginPath();
+            ctx.arc(ex, ey, 4, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Target
+            let tx = parseFloat(document.getElementById('targetX').value);
+            let ty = parseFloat(document.getElementById('targetY').value);
+            if (!isNaN(tx) && !isNaN(ty)) {
+                ctx.strokeStyle = '#f0f';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(centerX + tx, centerY - ty, 8, 0, 2 * Math.PI);
+                ctx.stroke();
+            }
+            
+            requestAnimationFrame(draw);
+        }
+        
+        // Start
+        draw();
+        initWebSocket();
+    </script>
+</body>
+</html>
