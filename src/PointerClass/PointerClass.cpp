@@ -10,7 +10,6 @@ Pointer:: Pointer()
 
 Pointer:: Pointer(double xCord, double YCord)
     : xCord(xCord), yCord(YCord){
-
     };
 
 double Pointer:: getxCord() const{
