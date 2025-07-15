@@ -20,7 +20,7 @@ public:
 
     double getJoint2Position() const; 
 
-    Pointer getEndEffectorPosition() const; // void pending implementation 
+    Pointer getEndEffectorPosition() const; 
 
     void setJoint1Position(double theta1); 
 
