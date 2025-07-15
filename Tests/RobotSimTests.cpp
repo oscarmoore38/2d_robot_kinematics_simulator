@@ -47,3 +47,38 @@ TEST_F(RobotArmTestSuite, ForwardKinematicsTest){
 
     
 }
+
+TEST_F(RobotArmTestSuite, InverseKinematicsTest){
+
+    RobotArm robotArm(8.0, 5.0);
+
+    robotArm.setJoint1Position(0.0);
+    robotArm.setJoint2Position(0.0);
+
+    EXPECT_EQ(0.0, robotArm.getJoint1Position());
+    EXPECT_EQ(0.0, robotArm.getJoint2Position());
+
+    Pointer outOfReachXYCords(12.0, 12.0);
+    Pointer tooCloseXYCords(2.0, 2.0);
+    Pointer correctDistanceXYCords(8.0, 8.0);
+
+    bool IkTooCloseResult = robotArm.inverseKinematics(tooCloseXYCords);
+    bool IkTooFarResult = robotArm.inverseKinematics(outOfReachXYCords);
+    bool IkCorrectDistanceResult = robotArm.inverseKinematics(correctDistanceXYCords);
+
+    // Should return false on both. 
+    EXPECT_FALSE(IkTooCloseResult);
+    EXPECT_FALSE(IkTooFarResult);
+
+    // Check return value is true for correct input
+    EXPECT_TRUE(IkCorrectDistanceResult);
+
+    // Get Robot arm End Effector pos 
+    Pointer curEndEffector = robotArm.getEndEffectorPosition(); 
+
+    // Check robot arm x, y cords to see if it moved. 
+    EXPECT_EQ(correctDistanceXYCords.getxCord(), curEndEffector.getxCord());
+    EXPECT_EQ(correctDistanceXYCords.getyCord(), curEndEffector.getyCord());
+
+
+}
