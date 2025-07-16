@@ -12,6 +12,9 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 add_subdirectory(googletest)
 
+include_directories(${CMAKE_SOURCE_DIR}/ThirdPartyLib/websocketpp)
+include_directories(${CMAKE_SOURCE_DIR}/ThirdPartyLib/asio/asio/include)
+
 # Automatically gather all source and header files
 file(GLOB Sources
     src/*.cpp  
