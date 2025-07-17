@@ -3,6 +3,9 @@
 #include <websocketpp/config/asio_no_tls.hpp>
 #include <websocketpp/server.hpp>
 #include "RobotArmClass/RobotArmClass.hpp"
+#include <string> 
+
+using namespace std;
 
 /**
  * @class Simulator
@@ -21,7 +24,7 @@ private:
 
     void stopServer(); 
 
-    void handleMessage(); 
+    void handleMessage(const string& message); 
     
 };
 
