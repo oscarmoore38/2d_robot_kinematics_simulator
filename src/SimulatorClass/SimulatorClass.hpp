@@ -29,9 +29,11 @@ private:
 
     void handleMessage(const std::string& message); 
 
-    void onOpen(server* s, websocketpp::connection_hdl hdl);
+    void onOpen(websocketpp::connection_hdl hdl);
 
-    void onClose(server* s, websocketpp::connection_hdl hdl);
+    void onClose(websocketpp::connection_hdl hdl);
+
+    void onMessage(websocketpp::connection_hdl hdl, server::message_ptr msg);
 
 
     
