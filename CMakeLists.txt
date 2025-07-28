@@ -12,12 +12,14 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 add_subdirectory(googletest)
 
+# Define ASIO_STANDALONE globally
+add_definitions(-DASIO_STANDALONE)
+add_definitions(-D_WEBSOCKETPP_CPP11_INTERNAL_)
+
 include_directories(${CMAKE_SOURCE_DIR}/ThirdPartyLib/websocketpp/)
 include_directories(${CMAKE_SOURCE_DIR}/ThirdPartyLib/asio/asio/include/)
 include_directories(${CMAKE_SOURCE_DIR}/src)
 
-# Define ASIO_STANDALONE globally
-add_definitions(-DASIO_STANDALONE)
 
 # Automatically gather all source and header files
 file(GLOB Sources
