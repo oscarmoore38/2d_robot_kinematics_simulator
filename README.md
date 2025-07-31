@@ -96,8 +96,6 @@ This project relies on specific versions of [Asio](https://think-async.com/) and
 
 ---
 
-### 📦 1. Clone Asio (version 1.10.8)
-
 I used a shallow clone of Asio 1.10.8 to reduce download size and ensure compatibility.
 
 ```bash
@@ -107,7 +105,7 @@ I used a shallow clone of Asio 1.10.8 to reduce download size and ensure compati
 git clone --depth 1 --branch asio-1-10-8 https://github.com/chriskohlhoff/asio.git
 
 git clone https://github.com/zaphoyd/websocketpp.git
-
+```
 
 ## **Contributing**
 
