@@ -86,15 +86,11 @@ The project includes unit and integration tests using Google Test. After buildin
 
 You can also run tests directly from the VS Code Test Explorer sidebar after the CMake Tools extension has configured the project.
 
-## **License**
-
-This project is licensed under the MIT License. See the LICENSE file for details.
 
 ## **Cloning Dependencies**
 
 This project relies on specific versions of [Asio](https://think-async.com/) and [WebSocket++](https://github.com/zaphoyd/websocketpp). If you're not using a package manager, follow the steps below to manually clone these libraries.
 
----
 
 I used a shallow clone of Asio 1.10.8 to reduce download size and ensure compatibility.
 
@@ -110,3 +106,7 @@ git clone https://github.com/zaphoyd/websocketpp.git
 ## **Contributing**
 
 Contributions are welcome! If you find a bug or have an idea for an improvement, please open an issue or submit a pull request.
+
+## **License**
+
+This project is licensed under the MIT License. See the LICENSE file for details.
