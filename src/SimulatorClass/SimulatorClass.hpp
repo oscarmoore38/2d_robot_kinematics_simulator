@@ -1,8 +1,8 @@
 #ifndef SIMULATOR_HPP
 #define SIMULATOR_HPP
+
 #include <websocketpp/config/asio_no_tls.hpp>
 #include <websocketpp/server.hpp>
-#include <asio.hpp>
 #include "RobotArmClass/RobotArmClass.hpp"
 #include <string> 
 
@@ -17,9 +17,7 @@ using server = websocketpp::server<websocketpp::config::asio>;
 class Simulator {
 public:
     RobotArm newRoboticArm; 
-    server simulatorServer;
-    asio::io_context io; 
-    
+    server simulatorServer;    
     
 
 private:

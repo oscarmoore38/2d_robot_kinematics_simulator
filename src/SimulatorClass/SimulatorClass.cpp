@@ -1,10 +1,12 @@
-#include <websocketpp/config/asio_no_tls.hpp>
-#include <websocketpp/server.hpp>
+
 #include "RobotArmClass/RobotArmClass.hpp"
 #include "SimulatorClass.hpp"
+#include <websocketpp/config/asio_no_tls.hpp>
+#include <websocketpp/server.hpp>
 
 #include <iostream>
 #include <string> 
+#include <functional> 
 
 using namespace std; 
 using server = websocketpp::server<websocketpp::config::asio>;
@@ -17,16 +19,18 @@ void Simulator::startServer(){
         simulatorServer.clear_access_channels(websocketpp::log::alevel::frame_payload);
 
         simulatorServer.init_asio();  
-
         simulatorServer.set_reuse_addr(true);
 
-        // Take non-static memeber functions and make them regular callable for set_handlers
-        simulatorServer.set_open_handler(bind(&onOpen, this, placeholders::_1));
-        simulatorServer.set_close_handler(bind(&onClose, this, placeholders::_1));
-        simulatorServer.set_message_handler(bind(&onMessage, this, placeholders::_1, placeholders::_2));
+        // Using bind to take non-static memeber functions and make them regular callables for set_handlers
+        simulatorServer.set_open_handler(std::bind(&Simulator::onOpen, this, placeholders::_1));
+        simulatorServer.set_close_handler(std::bind(&Simulator::onClose, this, placeholders::_1));
+        simulatorServer.set_message_handler(std::bind(&Simulator::onMessage, this, placeholders::_1, placeholders::_2));
 
         simulatorServer.listen(9002);
         simulatorServer.start_accept();
+
+        cout << "Starting server on port 9002" << endl; // TEST, remove later. 
+        
         simulatorServer.run(); 
 
     } catch (websocketpp::exception const & e){
