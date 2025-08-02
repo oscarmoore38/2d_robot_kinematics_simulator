@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -16,6 +17,7 @@
         #canvas { border: 1px solid #ccc; }
         .connection { position: absolute; top: 10px; right: 10px; padding: 5px; background: #ffcccc; }
         .connection.connected { background: #ccffcc; }
+        .debug { background: #f9f9f9; border: 1px solid #ddd; padding: 10px; margin-top: 10px; font-family: monospace; font-size: 12px; max-height: 200px; overflow-y: auto; }
     </style>
 </head>
 <body>
@@ -63,6 +65,12 @@
                 <div>θ1: <span id="theta1">0</span>°</div>
                 <div>θ2: <span id="theta2">0</span>°</div>
             </div>
+            
+            <!-- Debug section -->
+            <div>
+                <button onclick="testConnection()">Test Connection</button>
+                <button onclick="clearDebug()">Clear Debug</button>
+            </div>
         </div>
         
         <div class="canvas-area">
@@ -70,12 +78,17 @@
         </div>
     </div>
 
+    <!-- Debug output -->
+    <div class="debug" id="debug">Debug output will appear here...</div>
+
     <script>
         let canvas = document.getElementById('canvas');
         let ctx = canvas.getContext('2d');
         let centerX = canvas.width / 2;
         let centerY = canvas.height / 2;
         let ws = null;
+        let reconnectAttempts = 0;
+        let maxReconnectAttempts = 5;
         
         let armState = {
             theta1: 0, theta2: 0,
@@ -84,28 +97,90 @@
             joint2X: 0, joint2Y: 0
         };
         
+        // Debug logging function
+        function debugLog(message) {
+            const debugDiv = document.getElementById('debug');
+            const timestamp = new Date().toLocaleTimeString();
+            debugDiv.innerHTML += `[${timestamp}] ${message}<br>`;
+            debugDiv.scrollTop = debugDiv.scrollHeight;
+            console.log(message);
+        }
+        
+        function clearDebug() {
+            document.getElementById('debug').innerHTML = '';
+        }
+        
+        // Get correct WebSocket URL for Codespaces
+        function getWebSocketUrl() {
+            const hostname = window.location.hostname;
+            debugLog(`Current hostname: ${hostname}`);
+            debugLog(`Current protocol: ${window.location.protocol}`);
+            
+            if (hostname.includes('.app.github.dev')) {
+                // Already in the correct format - just change port and add proxy path
+                const baseHostname = hostname.replace('-5500.app.github.dev', '-9002.app.github.dev');
+                const wsUrl = `wss://${baseHostname}`;
+                debugLog(`Using Codespaces WebSocket URL (format 1): ${wsUrl}`);
+                return wsUrl;
+            } else if (hostname.includes('.github.dev')) {
+                // Convert to app.github.dev format
+                const baseHostname = hostname.replace('.github.dev', '.app.github.dev').replace('-5500', '-9002');
+                const wsUrl = `wss://${baseHostname}`;
+                debugLog(`Using Codespaces WebSocket URL (format 2): ${wsUrl}`);
+                return wsUrl;
+            } else {
+                // Local development
+                const wsUrl = 'ws://localhost:9002';
+                debugLog(`Using local WebSocket URL: ${wsUrl}`);
+                return wsUrl;
+            }
+        }
+        
+        function send(data) {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                const jsonData = JSON.stringify(data);
+                ws.send(jsonData);
+                debugLog(`Sent: ${jsonData}`);
+            } else {
+                debugLog(`Cannot send - WebSocket not connected. ReadyState: ${ws ? ws.readyState : 'null'}`);
+            }
+        }
+        
+        function testConnection() {
+            debugLog("Testing connection with simple message...");
+            send({type: 'test', message: 'Hello from frontend!'});
+        }
+        
         // Event listeners
         document.getElementById('j1').oninput = function(e) {
             let val = parseInt(e.target.value);
             document.getElementById('j1val').textContent = val;
+            armState.theta1 = val;
+            debugLog(`Joint 1 changed to: ${val}`);
             send({type: 'joint_angles', theta1: val, theta2: armState.theta2});
         };
         
         document.getElementById('j2').oninput = function(e) {
             let val = parseInt(e.target.value);
             document.getElementById('j2val').textContent = val;
+            armState.theta2 = val;
+            debugLog(`Joint 2 changed to: ${val}`);
             send({type: 'joint_angles', theta1: armState.theta1, theta2: val});
         };
         
         document.getElementById('l1').oninput = function(e) {
             let val = parseInt(e.target.value);
             document.getElementById('l1val').textContent = val;
+            armState.link1 = val;
+            debugLog(`Link 1 changed to: ${val}`);
             send({type: 'link_lengths', link1: val, link2: armState.link2});
         };
         
         document.getElementById('l2').oninput = function(e) {
             let val = parseInt(e.target.value);
             document.getElementById('l2val').textContent = val;
+            armState.link2 = val;
+            debugLog(`Link 2 changed to: ${val}`);
             send({type: 'link_lengths', link1: armState.link1, link2: val});
         };
         
@@ -115,19 +190,17 @@
             let y = centerY - (e.clientY - rect.top);
             document.getElementById('targetX').value = x.toFixed(1);
             document.getElementById('targetY').value = y.toFixed(1);
+            debugLog(`Canvas clicked at: (${x.toFixed(1)}, ${y.toFixed(1)})`);
         };
-        
-        function send(data) {
-            if (ws && ws.readyState === WebSocket.OPEN) {
-                ws.send(JSON.stringify(data));
-            }
-        }
         
         function setAngles(t1, t2) {
             document.getElementById('j1').value = t1;
             document.getElementById('j2').value = t2;
             document.getElementById('j1val').textContent = t1;
             document.getElementById('j2val').textContent = t2;
+            armState.theta1 = t1;
+            armState.theta2 = t2;
+            debugLog(`Setting angles to: θ1=${t1}, θ2=${t2}`);
             send({type: 'joint_angles', theta1: t1, theta2: t2});
         }
         
@@ -135,11 +208,15 @@
             let x = parseFloat(document.getElementById('targetX').value);
             let y = parseFloat(document.getElementById('targetY').value);
             if (!isNaN(x) && !isNaN(y)) {
+                debugLog(`Moving to target: (${x}, ${y})`);
                 send({type: 'target_position', x: x, y: y});
+            } else {
+                debugLog(`Invalid target coordinates: x=${x}, y=${y}`);
             }
         }
         
         function updateStatus(data) {
+            debugLog(`Received data: ${JSON.stringify(data)}`);
             Object.assign(armState, data);
             document.getElementById('endX').textContent = (armState.endX || 0).toFixed(1);
             document.getElementById('endY').textContent = (armState.endY || 0).toFixed(1);
@@ -148,16 +225,50 @@
         }
         
         function initWebSocket() {
-            ws = new WebSocket('ws://localhost:8080');
+            if (reconnectAttempts >= maxReconnectAttempts) {
+                debugLog(`Max reconnection attempts (${maxReconnectAttempts}) reached. Stopping.`);
+                return;
+            }
+            
+            const wsUrl = getWebSocketUrl();
+            debugLog(`Attempting to connect... (attempt ${reconnectAttempts + 1})`);
+            
+            ws = new WebSocket(wsUrl);
+            
             ws.onopen = () => {
+                debugLog('WebSocket connection opened successfully!');
                 document.getElementById('status').textContent = 'Connected';
                 document.getElementById('status').classList.add('connected');
+                reconnectAttempts = 0; // Reset counter on successful connection
             };
-            ws.onmessage = (e) => updateStatus(JSON.parse(e.data));
-            ws.onclose = () => {
+            
+            ws.onmessage = (e) => {
+                debugLog(`Raw message received: ${e.data}`);
+                try {
+                    const data = JSON.parse(e.data);
+                    updateStatus(data);
+                } catch (error) {
+                    debugLog(`Error parsing JSON: ${error.message}`);
+                    debugLog(`Raw data was: ${e.data}`);
+                }
+            };
+            
+            ws.onclose = (event) => {
+                debugLog(`WebSocket closed. Code: ${event.code}, Reason: ${event.reason}`);
                 document.getElementById('status').textContent = 'Disconnected';
                 document.getElementById('status').classList.remove('connected');
-                setTimeout(initWebSocket, 2000);
+                ws = null;
+                
+                reconnectAttempts++;
+                if (reconnectAttempts < maxReconnectAttempts) {
+                    debugLog(`Reconnecting in 3 seconds... (attempt ${reconnectAttempts + 1}/${maxReconnectAttempts})`);
+                    setTimeout(initWebSocket, 3000);
+                }
+            };
+            
+            ws.onerror = (error) => {
+                debugLog(`WebSocket error occurred: ${error}`);
+                console.error('WebSocket error:', error);
             };
         }
         
@@ -246,9 +357,12 @@
             requestAnimationFrame(draw);
         }
         
-        // Start
-        draw();
-        initWebSocket();
+        // Start everything
+        window.onload = function() {
+            debugLog('Page loaded, initializing...');
+            draw();
+            initWebSocket();
+        };
     </script>
 </body>
-</html>
+</html></html>
