@@ -12,6 +12,10 @@ RobotArm:: RobotArm(double l1, double l2)
 
 };
 
+RobotArm:: RobotArm()
+    : link1Length(0.0), link2Length(0.0), currentCoords(Pointer()){
+
+};
 
 bool RobotArm:: inverseKinematics(const Pointer& targetPosition){
     double x1 = targetPosition.getxCord();
@@ -96,3 +100,12 @@ void RobotArm:: setJoint2Position(double theta2) {
     return; 
 }
 
+void RobotArm:: setLinkLength1(double linkLength1) {
+    this->link1Length = linkLength1;
+    return; 
+}
+
+void RobotArm:: setLinkLength2(double linkLength2) {
+    this->link2Length = linkLength2;
+    return; 
+}

@@ -12,6 +12,8 @@ class RobotArm{
 public:
     RobotArm(double l1, double l2);
 
+    RobotArm(); 
+
     Pointer forwardKinematics(double theta1, double theta2); 
 
     bool inverseKinematics(const Pointer& targetPosition);
@@ -25,6 +27,10 @@ public:
     void setJoint1Position(double theta1); 
 
     void setJoint2Position(double theta2); 
+
+    void setLinkLength1(double linkLength1);
+
+    void setLinkLength2(double linkLength2);
 
 private: 
     double link1Length;
