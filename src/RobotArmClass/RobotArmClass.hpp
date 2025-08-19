@@ -32,6 +32,10 @@ public:
 
     void setLinkLength2(double linkLength2);
 
+    double getLinkLength1();
+
+    double getLinkLength2();
+
 private: 
     double link1Length;
     double link2Length; 

@@ -109,3 +109,11 @@ void RobotArm:: setLinkLength2(double linkLength2) {
     this->link2Length = linkLength2;
     return; 
 }
+
+double RobotArm:: getLinkLength1() {
+    return this->link1Length;
+}
+
+double RobotArm:: getLinkLength2() {
+    return this->link2Length;
+}
