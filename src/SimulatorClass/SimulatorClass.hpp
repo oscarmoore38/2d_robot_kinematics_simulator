@@ -16,16 +16,19 @@ using server = websocketpp::server<websocketpp::config::asio>;
 
 class Simulator {
 public:
-    RobotArm newRoboticArm; 
-    server simulatorServer;    
-    
+    server simulatorServer;   
+    RobotArm RoboticArm; 
 
-private:
+    Simulator(); 
+
     void startServer(); 
 
     void stopServer(); 
 
-    void handleMessage(const std::string& message); 
+    void handleMessage(const std::string& message, websocketpp::connection_hdl hdl); // For Testing, make private 
+
+private:
+    // void handleMessage(const std::string& message); 
 
     void onOpen(websocketpp::connection_hdl hdl);
 
