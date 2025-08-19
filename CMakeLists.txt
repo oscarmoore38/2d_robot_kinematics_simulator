@@ -19,6 +19,7 @@ add_definitions(-DASIO_STANDALONE)
 include_directories(${This} PUBLIC
     ${CMAKE_SOURCE_DIR}/ThirdPartyLib/asio/asio/include
     ${CMAKE_SOURCE_DIR}/ThirdPartyLib/websocketpp
+    ${CMAKE_SOURCE_DIR}/ThirdPartyLib/nlohmann
     ${CMAKE_SOURCE_DIR}/src
 )
 
